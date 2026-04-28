@@ -109,7 +109,7 @@ The Core2 performs lightweight feature engineering before transmission.
 
 ## Dataset Collection
 
-We simulated three real-world environments:
+Three real-world environments were simulated:
 
 - Library (quiet)
 - Cafe (moderate)
@@ -121,8 +121,6 @@ We simulated three real-world environments:
 - 4 runs per environment
 - ~3 minutes per run
 - ~4,300+ processed observations
-
-This expanded dataset was collected after instructor feedback requesting additional validation data.
 
 ---
 
@@ -247,6 +245,16 @@ The production system uses the optimized thresholds from the notebook.
 - MQTT stream visibility
 - CSV persistence
 - Flask request logs
+
+---
+
+## Project Context
+
+VibeChecker originated as a collaborative graduate-level AIoT project centered on real-time environment sensing and classification.
+
+Workstreams included device engineering, streaming infrastructure, data collection, analytics, and dashboard deployment.
+
+This repository is a polished public portfolio version maintained by Mariela Bracete, showcasing the final system design, modeling decisions, and production implementation.
 
 ---
 
