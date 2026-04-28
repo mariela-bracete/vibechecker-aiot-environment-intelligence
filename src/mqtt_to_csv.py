@@ -4,7 +4,7 @@ import csv
 import os
 from datetime import datetime
 
-BROKER_IP = "192.168.1.84"
+BROKER_IP = "your-broker-ip" # Replace with local MQTT broker IP when running locally
 BROKER_PORT = 1883
 TOPIC = "env/raw/#"
 CSV_FILE = "vibe_data.csv"
