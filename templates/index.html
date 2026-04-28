@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VibeChecker</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Nunito', sans-serif;
+            background: #f4e6d4;
+        }
+
+        /* HEADER */
+        .header {
+            background: #0f8b8d;
+            color: white;
+            padding: 16px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .logo {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 22px;
+        }
+
+        /* MAIN */
+        .main {
+            padding: 20px;
+            max-width: 520px;
+            margin: auto;
+        }
+
+        #container {
+            display: grid;
+            gap: 18px;
+        }
+
+        /* CARD */
+        .card {
+            background: rgba(255, 253, 248, 0.95);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+            border-left: 6px solid #d6c6b2;
+            transition: all 0.18s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+        }
+
+        .card.active {
+            border-left: 6px solid #2ecc71;
+        }
+
+        .card.inactive {
+            border-left: 6px solid #d6c6b2;
+        }
+
+        /* IMAGE HEADER */
+        .image {
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .image::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.5));
+        }
+
+        .image-content {
+            position: absolute;
+            bottom: 10px;
+            left: 12px;
+            right: 12px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .card.active .status-dot {
+            background: #2ecc71;
+        }
+
+        /* CONTENT */
+        .content {
+            padding: 14px 16px 16px;
+        }
+
+        .vibe {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #eee3d3;
+            margin: 10px 0;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .muted {
+            font-size: 12px;
+            color: #9a8f80;
+            margin-top: 8px;
+        }
+
+        .coming {
+            text-align: center;
+            color: #8c7f6d;
+            padding: 30px 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div class="logo">VibeChecker</div>
+    <div>☰</div>
+</div>
+
+<div class="main">
+    <div id="container"></div>
+</div>
+
+<div class="coming">
+    More locations coming soon 🍸🌳🏋️
+</div>
+
+<script>
+
+function formatTime(ts) {
+    if (!ts) return "No data";
+    const diff = (Date.now()/1000 - ts).toFixed(1);
+    return diff + "s ago";
+}
+
+function vibeColor(vibe) {
+    if (!vibe) return "#888";
+    if (vibe.toLowerCase().includes("calm")) return "#5dade2";
+    if (vibe.toLowerCase().includes("fun")) return "#ff6b6b";
+    return "#888";
+}
+
+/* AUTO IMAGE MAPPING */
+function getImage(key) {
+    const k = key.toLowerCase();
+
+    if (k.includes("library")) return "https://images.unsplash.com/photo-1512820790803-83ca734da794";
+    if (k.includes("gym")) return "https://images.unsplash.com/photo-1558611848-73f7eb4001a1";
+    if (k.includes("bar")) return "https://images.unsplash.com/photo-1514933651103-005eec06c04b";
+    if (k.includes("park")) return "https://images.unsplash.com/photo-1501785888041-af3ef285b470";
+    if (k.includes("cafe")) return "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb";
+    if (k.includes("club")) return "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80";
+
+    return "https://images.unsplash.com/photo-1492724441997-5dc865305da7"; // fallback
+}
+
+async function update() {
+    const res = await fetch("/live");
+    const data = await res.json();
+
+    const container = document.getElementById("container");
+    container.innerHTML = "";
+
+    for (const key in data) {
+        const d = data[key];
+
+        const card = document.createElement("div");
+        card.className = "card " + (d.active ? "active" : "inactive");
+
+        const imageUrl = getImage(key);
+
+        card.innerHTML = `
+            <div class="image" style="background-image:url('${imageUrl}')">
+                <div class="image-content">
+                    <div class="title">${key}</div>
+                    <div class="status-dot"></div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="vibe" style="color:${vibeColor(d.vibe_label)}">
+                    ${d.vibe_label}
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="meta-row">
+                    <div>🔊 ${d.noise_level_db ?? "--"} dB</div>
+                    <div>🌡 ${d.temperature_f ?? "--"} °F</div>
+                </div>
+
+                <div class="muted">
+                    Last seen: ${formatTime(d.timestamp)}
+                </div>
+            </div>
+        `;
+
+        container.appendChild(card);
+    }
+}
+
+setInterval(update, 1000);
+update();
+
+</script>
+
+</body>
+</html>
